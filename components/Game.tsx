@@ -68,31 +68,23 @@ export const Game: React.FC = () => {
         }
     }
 
-    return (
+       return (
         <>
-            <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-lg border-b border-[var(--color-border)]">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
-                        <div className="flex items-center space-x-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-[var(--color-primary)]" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M19.3,4.12a1,1,0,0,0-1.1-1.53,10.1,10.1,0,0,0-3.1,1.88,10,10,0,0,0-5.78,0,10.1,10.1,0,0,0-3.1-1.88A1,1,0,0,0,5.1,3.2a1,1,0,0,0-.22,1,9.88,9.88,0,0,0,1.9,3.4,1,1,0,0,0,.7.3,1,1,0,0,0,.71-.3,7.77,7.77,0,0,1,5.2,0,1,1,0,0,0,.71.3,1,1,0,0,0,.7-.3A9.88,9.88,0,0,0,19,4.2,1,1,0,0,0,19.3,4.12ZM10,12a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V13A1,1,0,0,0,10,12Zm0-4a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V9A1,1,0,0,0,10,8Zm5.71.29a.92.92,0,0,0-.11-.14,8,8,0,0,0-11.2,0,.92.92,0,0,0-.11.14.94.94,0,0,0,0,1.42A6,6,0,0,1,10,11a6,6,0,0,1,5.71-1.29A.94.94,0,0,0,15.71,8.29Z"/>
-                            </svg>
-                            <h1 className="text-xl font-header">Spice Jadoo</h1>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <Button onClick={startNewGame} variant="secondary">
-                                New Game
-                            </Button>
-                            <Button onClick={() => alert('Save feature coming soon!')}>
-                                Save Game
-                            </Button>
-                        </div>
-                    </div>
+            {/* Optional: You can remove this header if you prefer App.tsx's header only */}
+            <header className="app-header" style={{ marginTop: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span className="logo">🍛</span>
+                    <h1 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Spice Jadoo</h1>
+                </div>
+
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: 10 }}>
+                    <button className="btn ghost" onClick={startNewGame}>New Game</button>
+                    <button className="btn primary" onClick={() => alert('Save coming soon')}>Save Game</button>
                 </div>
             </header>
-            <main className="container mx-auto p-4 md:p-8">
+
+            <main style={{ marginTop: 18 }}>
                 {renderGameState()}
             </main>
         </>
     );
-};

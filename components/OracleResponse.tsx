@@ -1,12 +1,14 @@
 import React from 'react';
 import { OracleJudgement } from '../types';
 import { Card } from './ui/Card';
+import { Button } from './ui/Button';
 
 interface OracleResponseProps {
   judgement: OracleJudgement;
+  onClose: () => void;
 }
 
-export const OracleResponse: React.FC<OracleResponseProps> = ({ judgement }) => {
+export const OracleResponse: React.FC<OracleResponseProps> = ({ judgement, onClose }) => {
   const scoreColor = judgement.score >= 8 ? 'text-green-600' : judgement.score >= 5 ? 'text-amber-600' : 'text-red-600';
 
   return (
@@ -37,6 +39,11 @@ export const OracleResponse: React.FC<OracleResponseProps> = ({ judgement }) => 
                             </div>
                         </div>
                     </div>
+                </div>
+                <div className="mt-8 flex justify-center">
+                  <Button onClick={onClose}>
+                    Next Challenge
+                  </Button>
                 </div>
             </Card>
         </div>

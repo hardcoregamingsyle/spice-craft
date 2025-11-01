@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Spice, Flavor, FlavorProfile } from './types';
 
@@ -22,7 +23,7 @@ const TamarindIcon: React.FC<{className?: string}> = ({className}) => (
  <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.25,6.5A3.25,3.25,0,0,0,17,3.25H7A3.25,3.25,0,0,0,3.75,6.5v11A3.25,3.25,0,0,0,7,20.75H17a3.25,3.25,0,0,0,3.25-3.25ZM18,17.5a.75.75,0,0,1-.75.75H6.75A.75.75,0,0,1,6,17.5V6.5A.75.75,0,0,1,6.75,5.75H17.25a.75.75,0,0,1,.75.75Z M14.5,9.5a.75.75,0,0,0-.75-.75h-4a.75.75,0,0,0,0,1.5h4A.75.75,0,0,0,14.5,9.5Zm-1,4a.75.75,0,0,0-.75-.75h-2a.75.75,0,0,0,0,1.5h2A.75.75,0,0,0,13.5,13.5Z"/></svg>
 );
 
-const EMPTY_PROFILE: FlavorProfile = {
+export const EMPTY_PROFILE: FlavorProfile = {
   [Flavor.HEAT]: 0,
   [Flavor.EARTHY]: 0,
   [Flavor.SWEET]: 0,
