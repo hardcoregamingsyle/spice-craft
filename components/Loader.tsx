@@ -2,31 +2,47 @@ import React, { useState, useEffect } from 'react';
 
 const loadingMessages = [
     "Consulting the Oracle...",
-    "Weighing the cosmic essences...",
-    "Gauging the celestial flavors...",
+    "Simmering the spices...",
+    "Perfecting the flavors...",
     "Awaiting a divine verdict...",
-    "Decoding ancient recipes...",
+    "Plating your creation...",
 ];
 
-export const Loader: React.FC = () => {
-    const [message, setMessage] = useState(loadingMessages[0]);
+const Spinner: React.FC = () => (
+    <div 
+      className="w-16 h-16 border-4 border-[var(--color-border)] border-t-[var(--color-primary)] rounded-full animate-spin"
+      style={{ animation: 'spin 1s linear infinite' }}
+    ></div>
+);
+
+// Fix: Add message prop to allow for static or dynamic loading messages.
+interface LoaderProps {
+    message?: string;
+}
+
+export const Loader: React.FC<LoaderProps> = ({ message: staticMessage }) => {
+    const [dynamicMessage, setDynamicMessage] = useState(loadingMessages[0]);
 
     useEffect(() => {
-        const intervalId = setInterval(() => {
-            setMessage(prevMessage => {
-                const currentIndex = loadingMessages.indexOf(prevMessage);
-                const nextIndex = (currentIndex + 1) % loadingMessages.length;
-                return loadingMessages[nextIndex];
-            });
-        }, 2000);
+        if (!staticMessage) {
+            const intervalId = setInterval(() => {
+                setDynamicMessage(prevMessage => {
+                    const currentIndex = loadingMessages.indexOf(prevMessage);
+                    const nextIndex = (currentIndex + 1) % loadingMessages.length;
+                    return loadingMessages[nextIndex];
+                });
+            }, 2000);
 
-        return () => clearInterval(intervalId);
-    }, []);
+            return () => clearInterval(intervalId);
+        }
+    }, [staticMessage]);
+
+    const message = staticMessage || dynamicMessage;
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center z-50">
-        <div className="w-16 h-16 border-4 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
-        <p className="mt-4 text-amber-200 text-lg font-cinzel transition-opacity duration-500">{message}</p>
+    <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-50">
+        <Spinner />
+        <p className="mt-6 text-[var(--color-text-header)] text-lg font-semibold transition-opacity duration-500">{message}</p>
     </div>
   );
 };

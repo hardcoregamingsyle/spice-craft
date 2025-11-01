@@ -25,6 +25,7 @@ export interface Spice {
 
 export interface Challenge {
   id: number;
+  region: string;
   title: string;
   description: string;
   base: string;

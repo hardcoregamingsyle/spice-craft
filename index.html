@@ -4,38 +4,59 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Spice Sovereign</title>
+    <title>Spice Jadoo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Raleway:wght@400;500;700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+      
+      :root {
+        --color-bg: #F9F9F7;
+        --color-surface: #ffffff;
+        --color-primary: #F59E0B; /* Amber 500 */
+        --color-primary-dark: #D97706; /* Amber 600 */
+        
+        --color-text-header: #1F2937; /* Gray 800 */
+        --color-text-body: #4B5563; /* Gray 600 */
+        --color-text-muted: #9CA3AF; /* Gray 400 */
+        --color-text-on-primary: #ffffff;
+
+        --color-border: #F3F4F6; /* Gray 100 */
+        --color-border-dashed: #D1D5DB; /* Gray 300 */
+      }
+
       body {
-        font-family: 'Raleway', sans-serif;
-        background-color: #0c111f;
-        background-image:
-          radial-gradient(circle at 15% 20%, rgba(251, 191, 36, 0.08) 0%, transparent 40%),
-          radial-gradient(circle at 85% 80%, rgba(100, 150, 255, 0.08) 0%, transparent 40%);
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--color-bg);
+        color: var(--color-text-body);
         overflow-x: hidden;
       }
-      .font-cinzel {
-        font-family: 'Cinzel Decorative', cursive;
+      
+      .font-header {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        color: var(--color-text-header);
       }
-      .animate-fade-in {
-        animation: fadeIn 0.5s ease-in-out;
-      }
-      .animate-fade-in-slow {
-        animation: fadeIn 1s ease-in-out;
-      }
+
+      /* Animations */
       @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
       }
-      .animate-judgement-reveal {
-        animation: reveal 0.7s cubic-bezier(0.25, 1, 0.5, 1);
-      }
+      .animate-fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
+      .animate-fade-in-slow { animation: fadeIn 0.8s ease-in-out forwards; }
+
       @keyframes reveal {
-        from { opacity: 0; transform: scale(0.9) translateY(20px); }
+        from { opacity: 0; transform: scale(0.95) translateY(10px); }
         to { opacity: 1; transform: scale(1) translateY(0); }
       }
+      .animate-modal-reveal { animation: reveal 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+
+
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      
     </style>
   <script type="importmap">
 {

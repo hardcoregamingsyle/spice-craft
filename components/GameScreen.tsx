@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { CHALLENGES, SPICES } from '../constants';
+import React, { useState, useMemo, useCallback } from 'react';
+import { SPICES } from '../constants';
 import { Challenge, SelectedSpice, OracleJudgement, FlavorProfile, Flavor } from '../types';
 import { getJudgementFromOracle } from '../services/geminiService';
 
@@ -8,7 +8,6 @@ import { Cauldron } from './Cauldron';
 import { FlavorMeters } from './FlavorMeters';
 import { OracleResponse } from './OracleResponse';
 import { Loader } from './Loader';
-import { Tutorial } from './Tutorial';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 
@@ -21,30 +20,15 @@ const initialFlavorProfile: FlavorProfile = {
 };
 
 interface GameScreenProps {
-  onPlayAgain: () => void;
+  challenge: Challenge;
+  onNextChallenge: () => void;
+  onNewGame: () => void;
 }
 
-export const GameScreen: React.FC<GameScreenProps> = ({ onPlayAgain }) => {
-  const [challengeIndex, setChallengeIndex] = useState(0);
+export const GameScreen: React.FC<GameScreenProps> = ({ challenge, onNextChallenge, onNewGame }) => {
   const [selectedSpices, setSelectedSpices] = useState<SelectedSpice[]>([]);
   const [judgement, setJudgement] = useState<OracleJudgement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [showTutorial, setShowTutorial] = useState(false);
-
-  useEffect(() => {
-    const tutorialSeen = localStorage.getItem('spiceSovereignTutorialSeen');
-    if (!tutorialSeen) {
-      setShowTutorial(true);
-    }
-  }, []);
-
-  const handleCloseTutorial = () => {
-    localStorage.setItem('spiceSovereignTutorialSeen', 'true');
-    setShowTutorial(false);
-  };
-
-  const currentChallenge = CHALLENGES[challengeIndex];
-  const isLastChallenge = challengeIndex === CHALLENGES.length - 1;
 
   const currentFlavorProfile = useMemo((): FlavorProfile => {
     return selectedSpices.reduce((acc, selectedSpice) => {
@@ -88,19 +72,15 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onPlayAgain }) => {
   const handleSubmit = async () => {
     setIsLoading(true);
     setJudgement(null);
-    const result = await getJudgementFromOracle(currentChallenge, selectedSpices);
+    const result = await getJudgementFromOracle(challenge, selectedSpices);
     setJudgement(result);
     setIsLoading(false);
   };
 
-  const handleNextChallenge = () => {
-    if (!isLastChallenge) {
-      setChallengeIndex((prevIndex) => prevIndex + 1);
-      setSelectedSpices([]);
-      setJudgement(null);
-    } else {
-      onPlayAgain();
-    }
+  const handleNext = () => {
+    setSelectedSpices([]);
+    setJudgement(null);
+    onNextChallenge();
   };
   
   const resetChallenge = () => {
@@ -109,37 +89,44 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onPlayAgain }) => {
   }
 
   return (
-    <>
-    {showTutorial && <Tutorial onClose={handleCloseTutorial} />}
-    <div className="space-y-8 animate-fade-in-slow">
-      <Card>
-        <h2 className="text-2xl font-cinzel text-amber-300 mb-2">Challenge {challengeIndex + 1}: {currentChallenge.title}</h2>
-        <p className="text-gray-300">{currentChallenge.description}</p>
-        <p className="text-sm text-gray-400 mt-2">Base: <span className="italic">{currentChallenge.base}</span></p>
-      </Card>
+    <div className="animate-fade-in-slow">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+        {/* Left Panel */}
+        <div className="lg:col-span-2 space-y-6">
+           <Card>
+            <span className="text-sm font-semibold bg-[var(--color-primary)] text-white px-3 py-1 rounded-full">{challenge.region} India</span>
+            <h2 className="text-2xl font-header mt-3 mb-2">{challenge.title}</h2>
+            <p className="text-[var(--color-text-body)]">{challenge.description}</p>
+            <p className="text-sm text-[var(--color-text-muted)] mt-2">Base: <span className="italic text-[var(--color-text-body)]">{challenge.base}</span></p>
+          </Card>
+          <SpiceRack onSpiceSelect={addSpice} disabled={!!judgement} />
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-            <SpiceRack onSpiceSelect={addSpice} disabled={!!judgement} />
-        </div>
-        <div className="lg:col-span-1 space-y-8">
+        {/* Right Sidebar */}
+        <aside className="lg:col-span-1 space-y-6">
             <Cauldron selectedSpices={selectedSpices} onRemoveSpice={removeSpice}/>
-            <FlavorMeters currentProfile={currentFlavorProfile} targetProfile={currentChallenge.targetProfile} />
-        </div>
+            <FlavorMeters currentProfile={currentFlavorProfile} targetProfile={challenge.targetProfile} />
+        </aside>
       </div>
       
-      <div className="text-center mt-8 h-12">
+      {/* Action Buttons */}
+      <div className="text-center pt-8 h-14">
         {judgement ? (
-            <Button onClick={handleNextChallenge} className="animate-fade-in">
-              {isLastChallenge ? 'Play Again' : 'Next Divine Challenge'}
-            </Button>
+            <div className="flex items-center justify-center gap-4 animate-fade-in">
+              <Button onClick={handleNext}>
+                Next Challenge
+              </Button>
+               <Button onClick={onNewGame} variant="secondary">
+                New Game
+              </Button>
+            </div>
         ) : (
           <div className="flex items-center justify-center gap-4 animate-fade-in">
             <Button onClick={handleSubmit} disabled={isLoading || selectedSpices.length === 0}>
-                {isLoading ? 'Awaiting...' : 'Present to the Oracle'}
+                {isLoading ? 'Consulting...' : 'Present to the Oracle'}
             </Button>
             <Button onClick={resetChallenge} variant="secondary" disabled={isLoading || selectedSpices.length === 0}>
-                Clear Cauldron
+                Empty Cauldron
             </Button>
           </div>
         )}
@@ -148,6 +135,5 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onPlayAgain }) => {
       {isLoading && <Loader />}
       {judgement && !isLoading && <OracleResponse judgement={judgement} />}
     </div>
-    </>
   );
 };

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Spice, Challenge, Flavor, FlavorProfile } from './types';
+import { Spice, Flavor, FlavorProfile } from './types';
 
 // SVG Icons for Spices
 const ChiliIcon: React.FC<{className?: string}> = ({className}) => (
@@ -43,46 +43,4 @@ export const SPICES: Spice[] = [
     flavorProfile: { ...EMPTY_PROFILE, [Flavor.SWEET]: 10, [Flavor.AROMATIC]: 35 } },
   { id: 'tamarind', name: 'Tamarind', description: 'Adds a sour and tangy dimension.', icon: TamarindIcon,
     flavorProfile: { ...EMPTY_PROFILE, [Flavor.TANGY]: 35, [Flavor.SWEET]: 5 } },
-];
-
-export const CHALLENGES: Challenge[] = [
-  {
-    id: 1,
-    title: "A Comforting Lentil Dahl",
-    description: "Create a soothing and heartwarming dahl for a weary soul. It should be earthy and aromatic, with just a touch of warmth.",
-    base: "lentils and water",
-    targetProfile: {
-      [Flavor.HEAT]: 15,
-      [Flavor.EARTHY]: 60,
-      [Flavor.SWEET]: 10,
-      [Flavor.TANGY]: 5,
-      [Flavor.AROMATIC]: 40,
-    }
-  },
-  {
-    id: 2,
-    title: "A Fiery Royal Curry",
-    description: "Craft a chicken curry for a king's banquet. It must be bold and fiery, yet balanced with complex aromatics.",
-    base: "chicken and a rich tomato base",
-    targetProfile: {
-      [Flavor.HEAT]: 70,
-      [Flavor.EARTHY]: 50,
-      [Flavor.SWEET]: 15,
-      [Flavor.TANGY]: 25,
-      [Flavor.AROMATIC]: 60,
-    }
-  },
-   {
-    id: 3,
-    title: "A Celebratory Sweet Lassi",
-    description: "Concoct a yogurt drink for a joyous celebration. It demands a delicate balance of sweet, tangy, and fragrant notes.",
-    base: "yogurt and sugar",
-    targetProfile: {
-      [Flavor.HEAT]: 0,
-      [Flavor.EARTHY]: 5,
-      [Flavor.SWEET]: 50,
-      [Flavor.TANGY]: 40,
-      [Flavor.AROMATIC]: 70,
-    }
-  }
 ];
