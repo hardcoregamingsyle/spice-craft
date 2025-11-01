@@ -10,6 +10,7 @@ import { OracleResponse } from './OracleResponse';
 import { Loader } from './Loader';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
+import { Celebration } from './Celebration';
 
 const initialFlavorProfile: FlavorProfile = {
   [Flavor.HEAT]: 0,
@@ -29,6 +30,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ challenge, onNextChallen
   const [selectedSpices, setSelectedSpices] = useState<SelectedSpice[]>([]);
   const [judgement, setJudgement] = useState<OracleJudgement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const currentFlavorProfile = useMemo((): FlavorProfile => {
     return selectedSpices.reduce((acc, selectedSpice) => {
@@ -75,17 +77,23 @@ export const GameScreen: React.FC<GameScreenProps> = ({ challenge, onNextChallen
     const result = await getJudgementFromOracle(challenge, selectedSpices);
     setJudgement(result);
     setIsLoading(false);
+
+    if (result.score === 10) {
+      setShowCelebration(true);
+    }
   };
 
   const handleNext = () => {
     setSelectedSpices([]);
     setJudgement(null);
+    setShowCelebration(false);
     onNextChallenge();
   };
   
   const resetChallenge = () => {
     setSelectedSpices([]);
     setJudgement(null);
+    setShowCelebration(false);
   }
 
   return (
@@ -134,6 +142,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ challenge, onNextChallen
 
       {isLoading && <Loader />}
       {judgement && !isLoading && <OracleResponse judgement={judgement} />}
+      {showCelebration && <Celebration onComplete={() => setShowCelebration(false)} />}
     </div>
   );
 };

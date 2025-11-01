@@ -57,6 +57,30 @@
         to { transform: rotate(360deg); }
       }
       
+      /* Celebration Animations */
+      @keyframes confetti-fall {
+        0% { transform: translateY(-10vh) rotateZ(0deg); opacity: 1; }
+        100% { transform: translateY(110vh) rotateZ(720deg); opacity: 0; }
+      }
+      
+      .confetti {
+        position: absolute;
+        width: 10px;
+        height: 20px;
+        opacity: 0;
+        animation: confetti-fall 3s linear forwards;
+      }
+      
+      @keyframes celebrate-text {
+        0%, 100% { transform: scale(0.95); opacity: 0; }
+        10%, 90% { transform: scale(1.1); opacity: 1; }
+        20%, 80% { transform: scale(1); opacity: 1; }
+      }
+      
+      .animate-celebrate-text {
+        animation: celebrate-text 4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+      }
+      
     </style>
   <script type="importmap">
 {
