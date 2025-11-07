@@ -1,11 +1,44 @@
-import { GoogleGenAI, Type, Modality } from '@google/genai';
-import { SelectedSpice, OracleJudgement, Challenge, Flavor, FlavorProfile } from '../types';
+import { GoogleGenAI, Type, Modality, GenerateContentResponse, GenerateContentParameters } from '@google/genai';
+import apiKeyManager from './apiKeyManager';
+import { SelectedSpice, OracleJudgement, Challenge, Flavor } from '../types';
 
-if (!process.env.API_KEY) {
-  throw new Error("API_KEY environment variable not set");
-}
+// Helper function to get a Gemini client instance with the current key.
+const getAiClient = (): GoogleGenAI => {
+    const apiKey = apiKeyManager.getCurrentKey();
+    if (!apiKey) {
+        // This error will be caught by the retry logic and shouldn't crash the app unless all keys are invalid from the start.
+        throw new Error("No API Key available from manager.");
+    }
+    return new GoogleGenAI({ apiKey });
+};
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+/**
+ * A robust wrapper for ai.models.generateContent that handles API key rotation and retries.
+ * It will cycle through all available keys upon failure.
+ * @param params The parameters for the generateContent call.
+ * @returns The GenerateContentResponse.
+ * @throws An error if all available API keys fail.
+ */
+const generateContentWithRotation = async (params: GenerateContentParameters): Promise<GenerateContentResponse> => {
+    apiKeyManager.resetRotationCycle();
+
+    while (true) {
+        try {
+            const ai = getAiClient();
+            const response = await ai.models.generateContent(params);
+            return response;
+        } catch (error) {
+            console.warn(`API call failed with key ending in '...${apiKeyManager.getCurrentKey()?.slice(-4)}'. Rotating to next key.`, error);
+            if (!apiKeyManager.rotateKey()) {
+                console.error("All API keys have been tried and failed for this request.", error);
+                // If rotation fails (meaning we've tried all keys), throw the last error.
+                throw new Error("All available API keys failed. Please check your keys in apiKeyManager.ts.");
+            }
+            // If rotation succeeds, the loop will try again with the new key.
+        }
+    }
+};
+
 
 const ORACLE_SYSTEM_INSTRUCTION = "You are 'The Oracle of Flavors,' an ancient, wise, and poetic connoisseur of Indian cuisine. You speak with grandeur and authority, but also with brevity. Your purpose is to judge CULINARY CREATIONS submitted to you, which are ALWAYS 100% VEGAN. Keep your descriptions and feedback concise and impactful (around 1-2 sentences each). Always respond with a JSON object that matches the provided schema.";
 
@@ -41,13 +74,12 @@ const generateChallengeSchema = {
   required: ["title", "description", "base", "targetProfile"],
 };
 
-
 export const getJudgementFromOracle = async (challenge: Challenge, spices: SelectedSpice[]): Promise<OracleJudgement> => {
   try {
     const spiceList = spices.map(s => `- ${s.name}: ${s.quantity} part(s)`).join('\n');
     const prompt = `A new vegan culinary creation has been brought before you. The dish is based on the concept: '${challenge.title} - ${challenge.description}'. The base ingredients are: '${challenge.base}'. The creator has used the following divine spices:\n${spiceList}\n\nBased on this combination, please provide your divine judgment. Be creative, dramatic, and insightful. The dishName should be unique and sound legendary.`;
 
-    const response = await ai.models.generateContent({
+    const response = await generateContentWithRotation({
       model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
@@ -60,7 +92,7 @@ export const getJudgementFromOracle = async (challenge: Challenge, spices: Selec
     const result = JSON.parse(response.text.trim());
     return result as OracleJudgement;
   } catch (error) {
-    console.error("Error getting judgement from Oracle:", error);
+    console.error("Error getting judgement from Oracle after trying all keys:", error);
     return {
       dishName: "The Muddled Concoction",
       description: "The ether was disturbed, and the Oracle could not get a clear vision of your dish. The flavors are chaotic and unbalanced.",
@@ -74,7 +106,7 @@ export const generateChallenge = async (region: string): Promise<Challenge> => {
     try {
         const prompt = `Generate a new, unique, and interesting cooking challenge based on a 100% VEGAN dish from ${region} India. The challenge should feel fresh and not be a simple, standard recipe description.`;
 
-        const response = await ai.models.generateContent({
+        const response = await generateContentWithRotation({
             model: 'gemini-2.5-flash',
             contents: prompt,
             config: {
@@ -94,7 +126,7 @@ export const generateChallenge = async (region: string): Promise<Challenge> => {
         } as Challenge;
 
     } catch(error) {
-        console.error("Error generating challenge:", error);
+        console.error("Error generating challenge after trying all keys:", error);
         // Provide a fallback challenge on error
         return {
             id: 1,
@@ -115,7 +147,7 @@ export const generateChallenge = async (region: string): Promise<Challenge> => {
 
 export const generateSpeechFromText = async (text: string): Promise<string | null> => {
   try {
-    const response = await ai.models.generateContent({
+    const response = await generateContentWithRotation({
       model: "gemini-2.5-flash-preview-tts",
       contents: [{ parts: [{ text: `Speak with great excitement, joy, and energy! Your voice should be that of a grand, wise, and ancient Indian oracle who is thrilled to announce a magnificent culinary discovery. Speak at a brisk, energetic pace, about 1.6 times the normal speed. Proclaim this message: ${text}` }] }],
       config: {
@@ -135,7 +167,7 @@ export const generateSpeechFromText = async (text: string): Promise<string | nul
     }
     return base64Audio;
   } catch (error) {
-    console.error("Error generating speech:", error);
+    console.error("Error generating speech after trying all keys:", error);
     return null;
   }
 };
