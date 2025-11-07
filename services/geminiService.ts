@@ -1,5 +1,4 @@
-
-import { GoogleGenAI, Type } from '@google/genai';
+import { GoogleGenAI, Type, Modality } from '@google/genai';
 import { SelectedSpice, OracleJudgement, Challenge, Flavor, FlavorProfile } from '../types';
 
 if (!process.env.API_KEY) {
@@ -8,15 +7,15 @@ if (!process.env.API_KEY) {
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-const ORACLE_SYSTEM_INSTRUCTION = "You are 'The Oracle of Flavors,' an ancient, wise, and poetic connoisseur of Indian cuisine. You speak with grandeur and authority. Your purpose is to judge CULINARY CREATIONS submitted to you, which are ALWAYS 100% VEGAN. Always respond with a JSON object that matches the provided schema.";
+const ORACLE_SYSTEM_INSTRUCTION = "You are 'The Oracle of Flavors,' an ancient, wise, and poetic connoisseur of Indian cuisine. You speak with grandeur and authority, but also with brevity. Your purpose is to judge CULINARY CREATIONS submitted to you, which are ALWAYS 100% VEGAN. Keep your descriptions and feedback concise and impactful (around 1-2 sentences each). Always respond with a JSON object that matches the provided schema.";
 
 const judgeDishSchema = {
   type: Type.OBJECT,
   properties: {
     dishName: { type: Type.STRING, description: "A creative, evocative name for the dish based on its ingredients and concept." },
-    description: { type: Type.STRING, description: "A poetic and vivid description of the dish's flavor profile and aroma, as if you are tasting it." },
+    description: { type: Type.STRING, description: "A poetic and vivid description of the dish's flavor profile and aroma, as if you are tasting it. Keep it to 1-2 sentences." },
     score: { type: Type.NUMBER, description: "A numerical score out of 10 (e.g., 8.5) based on the balance and suitability of the spices for the dish concept." },
-    feedback: { type: Type.STRING, description: "Constructive feedback on how the dish could be improved or what makes it exceptional. Be specific about the spice interactions." },
+    feedback: { type: Type.STRING, description: "Constructive feedback on how the dish could be improved or what makes it exceptional. Be specific about the spice interactions. Keep it to 1-2 sentences." },
   },
   required: ["dishName", "description", "score", "feedback"],
 };
@@ -112,4 +111,31 @@ export const generateChallenge = async (region: string): Promise<Challenge> => {
             }
         };
     }
+};
+
+export const generateSpeechFromText = async (text: string): Promise<string | null> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash-preview-tts",
+      contents: [{ parts: [{ text: `Speak with great excitement, joy, and energy! Your voice should be that of a grand, wise, and ancient Indian oracle who is thrilled to announce a magnificent culinary discovery. Speak at a brisk, energetic pace, about 1.6 times the normal speed. Proclaim this message: ${text}` }] }],
+      config: {
+        responseModalities: [Modality.AUDIO],
+        speechConfig: {
+          voiceConfig: {
+            prebuiltVoiceConfig: {
+              voiceName: 'Kore', // A deep, resonant voice.
+            },
+          },
+        },
+      },
+    });
+    const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    if (!base64Audio) {
+      throw new Error("No audio data received from API.");
+    }
+    return base64Audio;
+  } catch (error) {
+    console.error("Error generating speech:", error);
+    return null;
+  }
 };

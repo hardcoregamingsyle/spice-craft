@@ -1,4 +1,6 @@
 
+import type { ComponentType } from 'react';
+
 export enum Flavor {
   HEAT = 'Heat',
   EARTHY = 'Earthy',
@@ -19,7 +21,8 @@ export interface Spice {
   id: string;
   name: string;
   description: string;
-  icon: React.ComponentType<{ className?: string }>;
+  // Fix: Use ComponentType and import it from React.
+  icon: ComponentType<{ className?: string }>;
   flavorProfile: FlavorProfile;
 }
 

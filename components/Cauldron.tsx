@@ -1,6 +1,7 @@
 import React from 'react';
 import { SelectedSpice } from '../types';
 import { Card } from './ui/Card';
+import { Button } from './ui/Button';
 
 interface CauldronProps {
   selectedSpices: SelectedSpice[];
@@ -24,9 +25,9 @@ export const Cauldron: React.FC<CauldronProps> = ({ selectedSpices, onRemoveSpic
                 <div style={{ fontWeight: 600 }}>{spice.name}</div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <div style={{ fontFamily: 'monospace', fontWeight: 700, padding: '4px 8px', borderRadius: 6, background: '#f3f4f6' }}>x{spice.quantity}</div>
-                  <button onClick={() => onRemoveSpice(spice.id)} className="btn ghost" title="Remove one">
+                  <Button variant="ghost" onClick={() => onRemoveSpice(spice.id)} title="Remove one">
                     Remove
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
