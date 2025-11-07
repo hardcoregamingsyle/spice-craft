@@ -1,7 +1,11 @@
 name = "spice-craft"
-pages_build_output_dir = "dist"
 compatibility_date = "2024-11-07"
 
-[build]
-command = "npm run build"
-cwd = "./spice-craft-main"
+# Path to the directory that Cloudflare Pages should deploy
+pages_build_output_dir = "dist"
+
+# Command Cloudflare Pages should run to build your project
+build_command = "npm run build"
+
+# The directory where your source code lives
+root_dir = "spice-craft-main"
